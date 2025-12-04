@@ -1,0 +1,202 @@
+{
+  "users": [
+    {
+      "id": "lh6j8k9l0m",
+      "name": "Admin Teste",
+      "email": "admin@teste.com",
+      "password": "$2b$10$rQ8K8YqZ9ZxZ9ZxZ9ZxZ9eJxZ9ZxZ9ZxZ9ZxZ9ZxZ9ZxZ9ZxZ9Zx.",
+      "createdAt": "2025-12-01T10:00:00.000Z",
+      "updatedAt": "2025-12-01T10:00:00.000Z"
+    },
+    {
+      "id": "mn7k9l0p1q",
+      "name": "Usuário Demo",
+      "email": "demo@teste.com",
+      "password": "$2b$10$rQ8K8YqZ9ZxZ9ZxZ9ZxZ9eJxZ9ZxZ9ZxZ9ZxZ9ZxZ9ZxZ9ZxZ9Zx.",
+      "createdAt": "2025-12-02T14:30:00.000Z",
+      "updatedAt": "2025-12-02T14:30:00.000Z"
+    },
+    {
+      "id": "miqr87ahterf0yilg3d",
+      "name": "Anderson Jr",
+      "email": "alsj1520@gmail.com",
+      "password": "$2b$10$yCxqzcqS46VMY7m0rYtg..MuqE01q5uzXXzrrcrLEh.ajWYzQfTLu",
+      "createdAt": "2025-12-04T01:25:45.065Z",
+      "updatedAt": "2025-12-04T01:25:45.065Z"
+    }
+  ],
+  "debtors": [
+    {
+      "id": "deb1a2b3c4",
+      "userId": "lh6j8k9l0m",
+      "name": "João Silva",
+      "amount": 500,
+      "description": "Empréstimo pessoal",
+      "dueDate": "2025-12-15T00:00:00.000Z",
+      "status": "pendente",
+      "createdAt": "2025-11-20T09:00:00.000Z",
+      "updatedAt": "2025-11-20T09:00:00.000Z"
+    },
+    {
+      "id": "deb2d5e6f7",
+      "userId": "lh6j8k9l0m",
+      "name": "Maria Santos",
+      "amount": 1200,
+      "description": "Pagamento de serviço",
+      "dueDate": "2025-12-20T00:00:00.000Z",
+      "status": "atrasado",
+      "createdAt": "2025-11-15T11:30:00.000Z",
+      "updatedAt": "2025-11-15T11:30:00.000Z"
+    },
+    {
+      "id": "deb3g8h9i0",
+      "userId": "lh6j8k9l0m",
+      "name": "Pedro Oliveira",
+      "amount": 300,
+      "description": "Venda de produto",
+      "dueDate": "2025-11-30T00:00:00.000Z",
+      "status": "pago",
+      "createdAt": "2025-11-10T16:45:00.000Z",
+      "updatedAt": "2025-11-28T10:00:00.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "trx1j2k3l4",
+      "userId": "lh6j8k9l0m",
+      "type": "entrada",
+      "category": "Salário",
+      "amount": 5000,
+      "description": "Salário mensal",
+      "date": "2025-12-01T00:00:00.000Z",
+      "createdAt": "2025-12-01T08:00:00.000Z",
+      "updatedAt": "2025-12-01T08:00:00.000Z"
+    },
+    {
+      "id": "trx2m5n6o7",
+      "userId": "lh6j8k9l0m",
+      "type": "saida",
+      "category": "Alimentação",
+      "amount": 350,
+      "description": "Compras do mês",
+      "date": "2025-12-02T00:00:00.000Z",
+      "createdAt": "2025-12-02T14:20:00.000Z",
+      "updatedAt": "2025-12-02T14:20:00.000Z"
+    },
+    {
+      "id": "trx3p8q9r0",
+      "userId": "lh6j8k9l0m",
+      "type": "saida",
+      "category": "Transporte",
+      "amount": 150,
+      "description": "Combustível",
+      "date": "2025-12-03T00:00:00.000Z",
+      "createdAt": "2025-12-03T09:15:00.000Z",
+      "updatedAt": "2025-12-03T09:15:00.000Z"
+    }
+  ],
+  "investments": [
+    {
+      "id": "inv1s2t3u4",
+      "userId": "lh6j8k9l0m",
+      "name": "Tesouro Direto",
+      "type": "renda_fixa",
+      "amount": 10000,
+      "initialAmount": 10000,
+      "returnRate": 12.5,
+      "description": "Investimento em Tesouro Selic",
+      "startDate": "2025-01-15T00:00:00.000Z",
+      "endDate": null,
+      "status": "ativo",
+      "createdAt": "2025-01-15T10:00:00.000Z",
+      "updatedAt": "2025-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "inv2v5w6x7",
+      "userId": "lh6j8k9l0m",
+      "name": "Ações PETR4",
+      "type": "acoes",
+      "amount": 5500,
+      "initialAmount": 5000,
+      "returnRate": 10,
+      "description": "Ações da Petrobras",
+      "startDate": "2025-06-01T00:00:00.000Z",
+      "endDate": null,
+      "status": "ativo",
+      "createdAt": "2025-06-01T11:30:00.000Z",
+      "updatedAt": "2025-12-01T11:30:00.000Z"
+    },
+    {
+      "id": "inv3y8z9a0",
+      "userId": "lh6j8k9l0m",
+      "name": "Fundo Imobiliário",
+      "type": "fundos",
+      "amount": 8200,
+      "initialAmount": 8000,
+      "returnRate": 2.5,
+      "description": "FII HGLG11",
+      "startDate": "2025-03-10T00:00:00.000Z",
+      "endDate": null,
+      "status": "ativo",
+      "createdAt": "2025-03-10T15:00:00.000Z",
+      "updatedAt": "2025-11-10T15:00:00.000Z"
+    }
+  ],
+  "settings": {
+    "lh6j8k9l0m": {
+      "currency": "BRL",
+      "language": "pt-BR",
+      "notifications": true,
+      "theme": "light",
+      "updatedAt": "2025-12-01T10:00:00.000Z"
+    },
+    "miqr87ahterf0yilg3d": {
+      "currency": "BRL",
+      "language": "pt-BR",
+      "notifications": true,
+      "theme": "light",
+      "updatedAt": "2025-12-04T01:31:33.450Z",
+      "categories": {
+        "income": [
+          "Salário",
+          "Freelance",
+          "Investimentos",
+          "Outros"
+        ],
+        "expense": [
+          "Alimentação",
+          "Transporte",
+          "Moradia",
+          "Lazer",
+          "Saúde",
+          "Educação",
+          "Outros"
+        ]
+      }
+    }
+  },
+  "debtHistory": [
+    {
+      "id": "hist1b2c3d4",
+      "userId": "lh6j8k9l0m",
+      "debtorId": "deb1a2b3c4",
+      "debtorName": "João Silva",
+      "amount": 500,
+      "action": "criado",
+      "description": "Dívida criada: João Silva",
+      "date": "2025-11-20T09:00:00.000Z",
+      "createdAt": "2025-11-20T09:00:00.000Z"
+    },
+    {
+      "id": "hist2e5f6g7",
+      "userId": "lh6j8k9l0m",
+      "debtorId": "deb3g8h9i0",
+      "debtorName": "Pedro Oliveira",
+      "amount": 300,
+      "action": "pago",
+      "description": "Dívida atualizada: Pedro Oliveira - Status alterado para pago",
+      "date": "2025-11-28T10:00:00.000Z",
+      "createdAt": "2025-11-28T10:00:00.000Z"
+    }
+  ]
+}

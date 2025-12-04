@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações - Meu Controle Financeiro</title>
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/settings.css">
+  <link rel="stylesheet" href="/css/icons.css">
+</head>
+<body>
+  <div id="header-container"></div>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Configurações</h1>
+      <p>Personalize sua experiência</p>
+    </div>
+
+    <div id="message-container"></div>
+
+    <div class="settings-section">
+      <h2>Categorias de Transações</h2>
+      
+      <div class="categories-container">
+        <div class="category-type">
+          <h3>Categorias de Entrada</h3>
+          <div class="category-list" id="income-categories"></div>
+          <div class="add-category-form">
+            <input type="text" id="new-income-category" placeholder="Nova categoria de entrada">
+            <button type="button" class="btn btn-primary btn-sm" onclick="addCategory('income')">Adicionar</button>
+          </div>
+        </div>
+
+        <div class="category-type">
+          <h3>Categorias de Saída</h3>
+          <div class="category-list" id="expense-categories"></div>
+          <div class="add-category-form">
+            <input type="text" id="new-expense-category" placeholder="Nova categoria de saída">
+            <button type="button" class="btn btn-primary btn-sm" onclick="addCategory('expense')">Adicionar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h2>Preferências</h2>
+      <form class="settings-form" id="settings-form">
+        <div class="form-group">
+          <label for="currency">Moeda</label>
+          <select id="currency">
+            <option value="BRL">Real (R$)</option>
+            <option value="USD">Dólar ($)</option>
+            <option value="EUR">Euro (€)</option>
+          </select>
+          <p class="settings-description">Escolha a moeda padrão para exibição</p>
+        </div>
+
+        <div class="form-group">
+          <label for="language">Idioma</label>
+          <select id="language">
+            <option value="pt-BR">Português (Brasil)</option>
+            <option value="en-US">English (US)</option>
+            <option value="es-ES">Español</option>
+          </select>
+          <p class="settings-description">Idioma da interface</p>
+        </div>
+
+        <div class="form-group">
+          <label for="theme">Tema</label>
+          <select id="theme">
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+            <option value="auto">Automático</option>
+          </select>
+          <p class="settings-description">Aparência do sistema</p>
+        </div>
+
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="notifications">
+            <label for="notifications">Ativar notificações</label>
+          </div>
+          <p class="settings-description">Receba alertas sobre transações e vencimentos</p>
+        </div>
+
+        <div class="save-button">
+          <button type="submit" class="btn btn-primary">Salvar Configurações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/settings.js"></script>
+</body>
+</html>

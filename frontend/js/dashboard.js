@@ -1,0 +1,440 @@
+// Variáveis para os gráficos
+let monthlyChart = null;
+let expensesChart = null;
+let evolutionChart = null;
+
+// Carregar dados do dashboard
+async function loadDashboard() {
+  try {
+    // Carregar saldo
+    const balanceResponse = await api.getBalance();
+    if (balanceResponse.data.sucesso) {
+      document.getElementById('total-balance').textContent = 
+        `R$ ${balanceResponse.data.saldo.toFixed(2).replace('.', ',')}`;
+    }
+
+    // Carregar total investido
+    const investmentsResponse = await api.getInvestments();
+    if (investmentsResponse.data.sucesso) {
+      const totalInvested = investmentsResponse.data.investimentos
+        .filter(inv => inv.status === 'ativo')
+        .reduce((sum, inv) => sum + inv.amount, 0);
+      
+      document.getElementById('total-investments').textContent = 
+        `R$ ${totalInvested.toFixed(2).replace('.', ',')}`;
+      
+      // Mostrar investimentos ativos
+      displayActiveInvestments(investmentsResponse.data.investimentos);
+    }
+
+    // Carregar total em dívidas
+    const debtorsResponse = await api.getDebtors();
+    if (debtorsResponse.data.sucesso) {
+      const totalDebts = debtorsResponse.data.devedores
+        .filter(debtor => debtor.status !== 'pago')
+        .reduce((sum, debtor) => sum + debtor.amount, 0);
+      
+      document.getElementById('total-debts').textContent = 
+        `R$ ${totalDebts.toFixed(2).replace('.', ',')}`;
+      
+      // Mostrar devedores recentes
+      displayRecentDebtors(debtorsResponse.data.devedores);
+    }
+
+    // Carregar transações
+    const transactionsResponse = await api.getTransactions();
+    if (transactionsResponse.data.sucesso) {
+      const transactions = transactionsResponse.data.transacoes;
+      
+      // Contar transações de hoje
+      const today = new Date().toISOString().split('T')[0];
+      const todayTransactions = transactions.filter(t => 
+        t.date.split('T')[0] === today
+      );
+      
+      document.getElementById('transactions-today').textContent = todayTransactions.length;
+      
+      // Mostrar transações recentes
+      displayRecentTransactions(transactions);
+      
+      // Criar gráficos
+      createMonthlyChart(transactions);
+      createExpensesChart(transactions);
+      createEvolutionChart(transactions);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dashboard:', error);
+  }
+}
+
+// Mostrar transações recentes
+function displayRecentTransactions(transactions) {
+  const container = document.getElementById('recent-transactions');
+  
+  if (transactions.length === 0) {
+    return;
+  }
+
+  const recent = transactions.slice(0, 5);
+  
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Descrição</th>
+          <th>Tipo</th>
+          <th>Valor</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${recent.map(t => `
+          <tr>
+            <td>${t.description || 'Sem descrição'}</td>
+            <td><span class="type-badge ${t.type}">${t.type}</span></td>
+            <td class="amount ${t.type === 'entrada' ? 'positive' : 'negative'}">
+              ${t.type === 'entrada' ? '+' : '-'} R$ ${t.amount.toFixed(2).replace('.', ',')}
+            </td>
+            <td>${new Date(t.date).toLocaleDateString('pt-BR')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// Mostrar devedores recentes
+function displayRecentDebtors(debtors) {
+  const container = document.getElementById('recent-debtors');
+  
+  if (debtors.length === 0) {
+    return;
+  }
+
+  const recent = debtors.slice(0, 5);
+  
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Valor</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${recent.map(d => `
+          <tr>
+            <td>${d.name}</td>
+            <td class="amount negative">R$ ${d.amount.toFixed(2).replace('.', ',')}</td>
+            <td><span class="status-badge ${d.status}">${d.status}</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// Mostrar investimentos ativos
+function displayActiveInvestments(investments) {
+  const container = document.getElementById('active-investments');
+  
+  const active = investments.filter(inv => inv.status === 'ativo');
+  
+  if (active.length === 0) {
+    return;
+  }
+
+  const html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Valor Atual</th>
+          <th>Retorno</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${active.map(inv => `
+          <tr>
+            <td>${inv.name}</td>
+            <td>${inv.type || 'N/A'}</td>
+            <td class="amount positive">R$ ${inv.amount.toFixed(2).replace('.', ',')}</td>
+            <td class="return-rate">${inv.returnRate}%</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  
+  container.innerHTML = html;
+}
+
+// Criar gráfico de resumo mensal (Receitas vs Despesas vs Saldo)
+function createMonthlyChart(transactions) {
+  const ctx = document.getElementById('monthly-chart');
+  if (!ctx) return;
+
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  const monthTransactions = transactions.filter(t => {
+    const date = new Date(t.date);
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+  });
+
+  const income = monthTransactions
+    .filter(t => t.type === 'income' || t.type === 'entrada')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const expense = monthTransactions
+    .filter(t => t.type === 'expense' || t.type === 'saida')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const balance = income - expense;
+
+  if (monthlyChart) monthlyChart.destroy();
+
+  monthlyChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Receitas', 'Despesas', 'Saldo'],
+      datasets: [{
+        label: 'Valor (R$)',
+        data: [income, expense, balance],
+        backgroundColor: [
+          'rgba(16, 185, 129, 0.7)',
+          'rgba(239, 68, 68, 0.7)',
+          balance >= 0 ? 'rgba(59, 130, 246, 0.7)' : 'rgba(239, 68, 68, 0.7)'
+        ],
+        borderColor: [
+          'rgb(16, 185, 129)',
+          'rgb(239, 68, 68)',
+          balance >= 0 ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)'
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'R$ ' + context.parsed.y.toFixed(2).replace('.', ',');
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return 'R$ ' + value.toFixed(0);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Criar gráfico de gastos por categoria (Pizza)
+function createExpensesChart(transactions) {
+  const ctx = document.getElementById('expenses-chart');
+  if (!ctx) return;
+
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  const monthExpenses = transactions.filter(t => {
+    const date = new Date(t.date);
+    return (t.type === 'expense' || t.type === 'saida') && 
+           date.getMonth() === currentMonth && 
+           date.getFullYear() === currentYear;
+  });
+
+  const categoryTotals = {};
+  monthExpenses.forEach(t => {
+    const category = t.category || 'Outros';
+    categoryTotals[category] = (categoryTotals[category] || 0) + t.amount;
+  });
+
+  const categories = Object.keys(categoryTotals);
+  const values = Object.values(categoryTotals);
+
+  const colors = [
+    'rgba(239, 68, 68, 0.8)',
+    'rgba(249, 115, 22, 0.8)',
+    'rgba(234, 179, 8, 0.8)',
+    'rgba(16, 185, 129, 0.8)',
+    'rgba(59, 130, 246, 0.8)',
+    'rgba(139, 92, 246, 0.8)',
+    'rgba(236, 72, 153, 0.8)',
+    'rgba(148, 163, 184, 0.8)'
+  ];
+
+  if (expensesChart) expensesChart.destroy();
+
+  expensesChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: categories,
+      datasets: [{
+        data: values,
+        backgroundColor: colors.slice(0, categories.length),
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 15,
+            font: {
+              size: 12
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.parsed / total) * 100).toFixed(1);
+              return context.label + ': R$ ' + context.parsed.toFixed(2).replace('.', ',') + ' (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Criar gráfico de evolução financeira (Linha - Últimos 6 meses)
+function createEvolutionChart(transactions) {
+  const ctx = document.getElementById('evolution-chart');
+  if (!ctx) return;
+
+  const months = [];
+  const incomeData = [];
+  const expenseData = [];
+  const balanceData = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date();
+    date.setMonth(date.getMonth() - i);
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    months.push(date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
+
+    const monthTransactions = transactions.filter(t => {
+      const tDate = new Date(t.date);
+      return tDate.getMonth() === month && tDate.getFullYear() === year;
+    });
+
+    const income = monthTransactions
+      .filter(t => t.type === 'income' || t.type === 'entrada')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const expense = monthTransactions
+      .filter(t => t.type === 'expense' || t.type === 'saida')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    incomeData.push(income);
+    expenseData.push(expense);
+    balanceData.push(income - expense);
+  }
+
+  if (evolutionChart) evolutionChart.destroy();
+
+  evolutionChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [
+        {
+          label: 'Receitas',
+          data: incomeData,
+          borderColor: 'rgb(16, 185, 129)',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.4,
+          fill: true,
+          borderWidth: 2
+        },
+        {
+          label: 'Despesas',
+          data: expenseData,
+          borderColor: 'rgb(239, 68, 68)',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          tension: 0.4,
+          fill: true,
+          borderWidth: 2
+        },
+        {
+          label: 'Saldo',
+          data: balanceData,
+          borderColor: 'rgb(59, 130, 246)',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4,
+          fill: true,
+          borderWidth: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            padding: 15,
+            font: {
+              size: 13,
+              weight: 'bold'
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': R$ ' + context.parsed.y.toFixed(2).replace('.', ',');
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return 'R$ ' + value.toFixed(0);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Carregar ao iniciar
+document.addEventListener('DOMContentLoaded', loadDashboard);

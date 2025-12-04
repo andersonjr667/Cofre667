@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Meu Controle Financeiro</title>
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="header-container"></div>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Visão geral das suas finanças</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><span class="icon icon-money"></span></div>
+        <div class="stat-label">Saldo Total</div>
+        <div class="stat-value" id="total-balance">R$ 0,00</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon"><span class="icon icon-chart"></span></div>
+        <div class="stat-label">Total em Dívidas</div>
+        <div class="stat-value negative" id="total-debts">R$ 0,00</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon"><span class="icon icon-growth"></span></div>
+        <div class="stat-label">Total Investido</div>
+        <div class="stat-value positive" id="total-investments">R$ 0,00</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon"><span class="icon icon-calendar"></span></div>
+        <div class="stat-label">Transações Hoje</div>
+        <div class="stat-value" id="transactions-today">0</div>
+      </div>
+    </div>
+
+    <div class="charts-section">
+      <div class="chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Resumo Mensal</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="monthly-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-header">
+          <h2 class="card-title">Gastos por Categoria</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="expenses-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-section">
+      <div class="chart-card full-width">
+        <div class="card-header">
+          <h2 class="card-title">Evolução Financeira (Últimos 6 Meses)</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="evolution-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Últimas Transações</h2>
+          <a href="/pages/transactions.html" class="btn btn-small btn-primary">Ver Todas</a>
+        </div>
+        <div id="recent-transactions">
+          <div class="empty-state">
+            <div class="empty-state-icon"><span class="icon icon-empty"></span></div>
+            <p>Nenhuma transação recente</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Devedores Recentes</h2>
+          <a href="/pages/debtors.html" class="btn btn-small btn-primary">Ver Todos</a>
+        </div>
+        <div id="recent-debtors">
+          <div class="empty-state">
+            <div class="empty-state-icon"><span class="icon icon-people"></span></div>
+            <p>Nenhum devedor cadastrado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+      <div class="card-header">
+        <h2 class="card-title">Investimentos Ativos</h2>
+        <a href="/pages/investments.html" class="btn btn-small btn-primary">Ver Todos</a>
+      </div>
+      <div id="active-investments">
+        <div class="empty-state">
+          <div class="empty-state-icon"><span class="icon icon-chart"></span></div>
+          <p>Nenhum investimento ativo</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/header.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

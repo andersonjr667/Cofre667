@@ -1,0 +1,110 @@
+/* CSS Icons - Substituindo Emojis */
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  position: relative;
+  font-style: normal;
+}
+
+.icon::before {
+  content: '';
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ícone Dinheiro/Money 💰 */
+.icon-money::before {
+  content: '$';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #10b981;
+}
+
+/* Ícone Gráfico/Chart 📊 */
+.icon-chart::before {
+  content: '≡';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #10b981;
+  transform: rotate(90deg);
+}
+
+/* Ícone Transação/Transaction 💸 */
+.icon-transaction::before {
+  content: '⇄';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #10b981;
+}
+
+/* Ícone Pessoas/People 👥 */
+.icon-people::before {
+  content: '⚇';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #10b981;
+}
+
+/* Ícone Crescimento/Growth 📈 */
+.icon-growth::before {
+  content: '↗';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #10b981;
+}
+
+/* Ícone Calendário/Calendar 📅 */
+.icon-calendar::before {
+  content: '◫';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #10b981;
+}
+
+/* Ícone Vazio/Empty 📭 */
+.icon-empty::before {
+  content: '□';
+  font-weight: bold;
+  font-size: 1.2em;
+  color: #9ca3af;
+}
+
+/* Feature Icons (maiores) */
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.feature-icon .icon::before {
+  font-size: 1em;
+}
+
+/* Stat Icons (médios) */
+.stat-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.stat-icon .icon::before {
+  font-size: 1em;
+}
+
+/* Empty State Icons (grandes) */
+.empty-state-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state-icon .icon::before {
+  font-size: 1em;
+  color: #9ca3af;
+}
