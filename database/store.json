@@ -297,6 +297,28 @@
       "description": "Dívida atualizada: Breno",
       "date": "2025-12-05T17:31:13.341Z",
       "createdAt": "2025-12-05T17:31:13.341Z"
+    },
+    {
+      "id": "mit5xis3v2bghoaq94d",
+      "userId": "693306c9c093c3b426e188d3",
+      "debtorId": "69331bf5fa4de06d266b1ae7",
+      "debtorName": "Ester",
+      "amount": 0,
+      "action": "criado",
+      "description": "Dívida criada: Ester",
+      "date": "2025-12-05T17:52:53.331Z",
+      "createdAt": "2025-12-05T17:52:53.331Z"
+    },
+    {
+      "id": "mit5xtkd18ow2qla1fy",
+      "userId": "693306c9c093c3b426e188d3",
+      "debtorId": "69331c03fa4de06d266b1aea",
+      "debtorName": "Leo",
+      "amount": 0,
+      "action": "criado",
+      "description": "Dívida criada: Leo",
+      "date": "2025-12-05T17:53:07.309Z",
+      "createdAt": "2025-12-05T17:53:07.309Z"
     }
   ]
 }

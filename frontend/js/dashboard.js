@@ -71,19 +71,21 @@ async function loadDashboard() {
     // Carregar total em dívidas
     const debtorsResponse = await api.getDebtors();
     if (debtorsResponse.data.sucesso) {
-      const totalDebts = debtorsResponse.data.devedores
-        .filter(debtor => {
-          // considerar 'pago' (valor antigo) ou 'em dia' como quitado
-          const st = (debtor.status || '').toLowerCase();
-          return st !== 'pago' && st !== 'em dia';
-        })
+      // calcular status dinamicamente para consistência com a página Devedores
+      const debtorsWithStatus = debtorsResponse.data.devedores.map(d => ({
+        ...d,
+        _computedStatus: computeDebtorStatus(d) // 'em dia' | 'pendente' | 'atrasado'
+      }));
+
+      const totalDebts = debtorsWithStatus
+        .filter(debtor => (debtor._computedStatus || '').toLowerCase() !== 'em dia')
         .reduce((sum, debtor) => sum + debtor.amount, 0);
       
       document.getElementById('total-debts').textContent = 
         `R$ ${totalDebts.toFixed(2).replace('.', ',')}`;
       
-      // Mostrar devedores recentes
-      displayRecentDebtors(debtorsResponse.data.devedores);
+      // Mostrar devedores recentes (usar status calculado)
+      displayRecentDebtors(debtorsWithStatus);
     }
 
     // Carregar transações
@@ -171,9 +173,9 @@ function displayRecentDebtors(debtors) {
       </thead>
       <tbody>
         ${recent.map(d => {
-          // normalizar label/class para exibição
-          const st = (d.status || '').toLowerCase();
-          const label = (st === 'pago' || st === 'em dia') ? 'em dia' : (st || 'pendente');
+          // normalizar/usar status calculado (suporta _computedStatus ou status antigo)
+          const stRaw = (d._computedStatus || d.status || '').toLowerCase();
+          const label = (stRaw === 'pago' || stRaw === 'em dia') ? 'em dia' : (stRaw || 'pendente');
           const cls = label.replace(/\s+/g, '-');
           return `
           <tr>
@@ -490,6 +492,25 @@ function createEvolutionChart(transactions) {
       }
     }
   });
+}
+
+// Função utilitária para calcular status de devedor (mesma lógica usada em debtors.js)
+function computeDebtorStatus(d) {
+  const amount = Number(d.amount) || 0;
+  if (amount === 0) return 'em dia';
+
+  if (d.dueDate) {
+    try {
+      const due = new Date(d.dueDate);
+      const dueYMD = due.toISOString().split('T')[0];
+      const todayYMD = new Date().toISOString().split('T')[0];
+      if (dueYMD < todayYMD) return 'atrasado';
+    } catch (e) {
+      // ignore parse errors
+    }
+  }
+
+  return 'pendente';
 }
 
 // Carregar ao iniciar
