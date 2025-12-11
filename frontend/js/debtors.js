@@ -239,10 +239,13 @@ window.showBalanceForm = function(debtorId) {
       return;
     }
 
-    // calcular novo montant da dívida
+    // calcular novo montante da dívida
+    // Para permitir registrar que o usuário agora deve à pessoa,
+    // não truncamos para zero quando a ação for 'pagou' — permitimos saldo negativo.
     let newAmount = debtor.amount;
     if (action === 'pagou') {
-      newAmount = Math.max(0, newAmount - amount);
+      // Subtrai o valor (pode resultar em saldo negativo)
+      newAmount = newAmount - amount;
     } else {
       // emprestou -> aumenta dívida
       newAmount = newAmount + amount;
@@ -258,7 +261,7 @@ window.showBalanceForm = function(debtorId) {
         category: `${action === 'pagou' ? 'Recebimento' : 'Empréstimo'} - Devedor: ${debtor.name}`,
         amount: amount,
         description: desc || (action === 'pagou' ? 'Pagamento recebido' : 'Novo empréstimo'),
-        date: date || new Date().toISOString()
+        date: date ? new Date(`${date}T12:00:00`).toISOString() : new Date().toISOString()
       };
       await api.createTransaction(tx);
 

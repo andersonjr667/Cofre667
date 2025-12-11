@@ -68,9 +68,9 @@ filterType.addEventListener('change', displayTransactions);
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // Pegar a data e adicionar horário local para evitar problema de timezone
+  // Pegar a data e adicionar horário local (meio-dia) para evitar problema de timezone
   const dateValue = document.getElementById('date').value;
-  const dateWithTime = dateValue ? `${dateValue}T12:00:00` : new Date().toISOString();
+  const dateWithTime = dateValue ? new Date(`${dateValue}T12:00:00`).toISOString() : new Date().toISOString();
 
   const data = {
     type: document.getElementById('type').value,

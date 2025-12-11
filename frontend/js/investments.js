@@ -66,6 +66,7 @@ form.addEventListener('submit', async (e) => {
     returnRate = (currentCDI * cdiPercent / 100);
   }
 
+  const startDateVal = document.getElementById('startDate').value;
   const data = {
     name: document.getElementById('name').value,
     type: document.getElementById('type').value,
@@ -74,7 +75,7 @@ form.addEventListener('submit', async (e) => {
     returnRate: returnRate,
     cdiPercent: cdiPercent,
     description: document.getElementById('description').value,
-    startDate: document.getElementById('startDate').value,
+    startDate: startDateVal ? new Date(`${startDateVal}T12:00:00`).toISOString() : new Date().toISOString(),
     status: document.getElementById('status').value
   };
 
