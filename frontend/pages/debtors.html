@@ -10,7 +10,6 @@
 </head>
 <body>
   <div id="header-container"></div>
-  <div id="header-container"></div>
 
   <div class="container">
     <div class="page-header">
@@ -45,7 +44,16 @@
     </div>
   </div>
 
-  <!-- Modal removed: quick-entry card replaces the modal form -->
+  <!-- Modal para histórico do devedor -->
+  <div id="history-modal" class="modal">
+    <div class="modal-content history-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="history-modal-title">Histórico do Devedor</h3>
+        <button class="close-btn" id="close-history-modal">&times;</button>
+      </div>
+      <div id="history-modal-body">Carregando...</div>
+    </div>
+  </div>
 
   <script src="/js/api.js"></script>
   <script src="/js/header.js"></script>

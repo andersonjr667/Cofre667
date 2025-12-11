@@ -15,6 +15,11 @@ let currentSettings = {
 
 const cleanupActions = [
   {
+    scope: 'all_data',
+    title: 'Apagar todos os dados',
+    description: 'Remove transações, investimentos, devedores, histórico e redefine configurações.'
+  },
+  {
     scope: 'transactions_all',
     title: 'Apagar todas as transações',
     description: 'Remove entradas e saídas da sua conta.'
@@ -37,7 +42,12 @@ const cleanupActions = [
   {
     scope: 'debtors_all',
     title: 'Apagar devedores',
-    description: 'Remove devedores e valores associados.'
+    description: 'Remove cadastros de devedores.'
+  },
+  {
+    scope: 'debtors_reset',
+    title: 'Apagar dívidas',
+    description: 'Zera todos os valores, mantendo os devedores cadastrados.'
   },
   {
     scope: 'debtHistory_all',

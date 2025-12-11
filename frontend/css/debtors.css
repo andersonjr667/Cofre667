@@ -61,6 +61,35 @@ tr:hover {
   gap: 8px;
 }
 
+.history-modal-content {
+  max-width: 720px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.history-table th {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: #374151;
+  background: #f9fafb;
+}
+
+.history-empty {
+  padding: 10px;
+  color: #6b7280;
+}
+
 .modal {
   display: none;
   position: fixed;
