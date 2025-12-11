@@ -27,7 +27,7 @@ function normalizeDateInput(raw) {
       } else {
         day = p1; month = p2; // assume D/M/Y
       }
-      const d = new Date(Date.UTC(year, month - 1, day));
+      const d = new Date(year, month - 1, day); // Usar fuso horário local em vez de UTC
       if (!isNaN(d)) return d;
     }
   }
