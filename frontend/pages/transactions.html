@@ -18,14 +18,39 @@
       <p>Gerencie suas entradas e saídas</p>
     </div>
 
-    <div class="filter-bar">
-      <div class="filter-group">
-        <label for="filter-type">Filtrar por tipo:</label>
+    <div class="filter-bar" style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;">
+      <div class="filter-group" style="display:flex; flex-direction:column; gap:4px;">
+        <label for="filter-type">Tipo</label>
         <select id="filter-type">
           <option value="all">Todas</option>
           <option value="entrada">Entradas</option>
           <option value="saida">Saídas</option>
         </select>
+      </div>
+
+      <div class="filter-group" style="display:flex; flex-direction:column; gap:4px;">
+        <label for="filter-category">Categoria</label>
+        <select id="filter-category">
+          <option value="all">Todas</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="display:flex; flex-direction:column; gap:4px; min-width:180px;">
+        <label for="filter-search">Busca</label>
+        <input type="text" id="filter-search" placeholder="Descrição ou categoria" />
+      </div>
+
+      <div class="filter-group" style="display:flex; flex-direction:column; gap:4px;">
+        <label for="filter-start">Início</label>
+        <input type="date" id="filter-start" />
+      </div>
+
+      <div class="filter-group" style="display:flex; flex-direction:column; gap:4px;">
+        <label for="filter-end">Fim</label>
+        <input type="date" id="filter-end" />
+      </div>
+
+      <div class="filter-group" style="margin-left:auto;">
         <button class="btn btn-primary" id="add-transaction-btn">+ Nova Transação</button>
       </div>
     </div>

@@ -91,6 +91,10 @@ const addBtn = document.getElementById('add-transaction-btn');
 const closeBtn = document.getElementById('close-modal');
 const cancelBtn = document.getElementById('cancel-btn');
 const filterType = document.getElementById('filter-type');
+const filterCategory = document.getElementById('filter-category');
+const filterSearch = document.getElementById('filter-search');
+const filterStart = document.getElementById('filter-start');
+const filterEnd = document.getElementById('filter-end');
 const typeSelect = document.getElementById('type');
 const categorySelect = document.getElementById('category');
 
@@ -101,9 +105,19 @@ async function loadCategories() {
     if (response.data.sucesso && response.data.configuracoes.categories) {
       categories = response.data.configuracoes.categories;
     }
+    populateCategoryFilter();
   } catch (error) {
     console.error('Erro ao carregar categorias:', error);
   }
+}
+
+function populateCategoryFilter() {
+  if (!filterCategory) return;
+  const set = new Set();
+  (categories.income || []).forEach(c => set.add(c));
+  (categories.expense || []).forEach(c => set.add(c));
+  const opts = ['<option value="all">Todas</option>', ...Array.from(set).map(c => `<option value="${c}">${c}</option>`)];
+  filterCategory.innerHTML = opts.join('');
 }
 
 // Atualizar opções de categoria com base no tipo
@@ -142,6 +156,10 @@ cancelBtn.addEventListener('click', () => modal.classList.remove('active'));
 
 // Filtrar transações
 filterType.addEventListener('change', displayTransactions);
+filterCategory.addEventListener('change', displayTransactions);
+filterSearch.addEventListener('input', displayTransactions);
+filterStart.addEventListener('change', displayTransactions);
+filterEnd.addEventListener('change', displayTransactions);
 
 // Submeter formulário
 form.addEventListener('submit', async (e) => {
@@ -203,11 +221,39 @@ async function loadTransactions() {
 function displayTransactions() {
   const container = document.getElementById('transactions-table');
   const filter = filterType.value;
+  const catFilter = filterCategory.value;
+  const search = (filterSearch.value || '').trim().toLowerCase();
+  const startDate = filterStart.value ? new Date(`${filterStart.value}T00:00:00`) : null;
+  const endDate = filterEnd.value ? new Date(`${filterEnd.value}T23:59:59`) : null;
 
   let filtered = transactions;
   if (filter !== 'all') {
     filtered = transactions.filter(t => t.type === filter);
   }
+
+  if (catFilter && catFilter !== 'all') {
+    filtered = filtered.filter(t => (t.category || '').toLowerCase() === catFilter.toLowerCase());
+  }
+
+  if (search) {
+    filtered = filtered.filter(t => {
+      const desc = (t.description || '').toLowerCase();
+      const cat = (t.category || '').toLowerCase();
+      return desc.includes(search) || cat.includes(search);
+    });
+  }
+
+  if (startDate || endDate) {
+    filtered = filtered.filter(t => {
+      const d = normalizeToDate(t.date);
+      if (startDate && d < startDate) return false;
+      if (endDate && d > endDate) return false;
+      return true;
+    });
+  }
+
+  // Ordenar mais recente -> mais antiga
+  filtered = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   if (filtered.length === 0) {
     container.innerHTML = `
