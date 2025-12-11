@@ -121,6 +121,18 @@ class DebtorModel {
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
+
+  // Apagar todos os devedores do usuário
+  async deleteManyByUser(userId) {
+    if (isConnected()) {
+      await DebtorSchema.deleteMany({ userId });
+      return true;
+    }
+    const all = jsonStore.getTable('debtors') || [];
+    const remaining = all.filter(d => d.userId !== userId);
+    jsonStore.updateTable('debtors', remaining);
+    return true;
+  }
 }
 
 module.exports = new DebtorModel();

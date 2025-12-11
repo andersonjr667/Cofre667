@@ -71,6 +71,14 @@ class DebtHistoryModel {
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
+
+  // Apagar histórico por usuário
+  async deleteManyByUser(userId) {
+    const all = jsonStore.getTable('debtHistory') || [];
+    const remaining = all.filter(h => h.userId !== userId);
+    jsonStore.updateTable('debtHistory', remaining);
+    return true;
+  }
 }
 
 module.exports = new DebtHistoryModel();

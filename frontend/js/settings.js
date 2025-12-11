@@ -1,5 +1,6 @@
 const form = document.getElementById('settings-form');
 const messageContainer = document.getElementById('message-container');
+const cleanupContainer = document.getElementById('cleanup-actions');
 
 let currentSettings = {
   currency: 'BRL',
@@ -11,6 +12,39 @@ let currentSettings = {
     expense: ['Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação', 'Outros']
   }
 };
+
+const cleanupActions = [
+  {
+    scope: 'transactions_all',
+    title: 'Apagar todas as transações',
+    description: 'Remove entradas e saídas da sua conta.'
+  },
+  {
+    scope: 'transactions_entrada',
+    title: 'Apagar apenas entradas',
+    description: 'Mantém saídas, apaga somente lançamentos de entrada.'
+  },
+  {
+    scope: 'transactions_saida',
+    title: 'Apagar apenas saídas',
+    description: 'Mantém entradas, apaga apenas lançamentos de saída.'
+  },
+  {
+    scope: 'investments_all',
+    title: 'Apagar investimentos',
+    description: 'Remove todos os investimentos cadastrados.'
+  },
+  {
+    scope: 'debtors_all',
+    title: 'Apagar devedores',
+    description: 'Remove devedores e valores associados.'
+  },
+  {
+    scope: 'debtHistory_all',
+    title: 'Apagar histórico de dívidas',
+    description: 'Limpa registros de histórico de dívidas.'
+  }
+];
 
 // Carregar configurações
 async function loadSettings() {
@@ -58,6 +92,25 @@ function renderCategories() {
       <button type="button" class="btn-delete" onclick="removeCategory('expense', ${index})" title="Remover">×</button>
     </div>
   `).join('');
+}
+
+// Renderizar ações de limpeza
+function renderCleanupActions() {
+  if (!cleanupContainer) return;
+
+  cleanupContainer.innerHTML = cleanupActions.map(action => `
+    <div class="cleanup-card">
+      <div>
+        <h4>${action.title}</h4>
+        <p>${action.description}</p>
+      </div>
+      <button type="button" class="btn btn-danger" data-scope="${action.scope}">Apagar</button>
+    </div>
+  `).join('');
+
+  cleanupContainer.querySelectorAll('button[data-scope]').forEach(btn => {
+    btn.addEventListener('click', () => handleCleanup(btn.dataset.scope));
+  });
 }
 
 // Adicionar categoria
@@ -143,4 +196,28 @@ function showMessage(message, type) {
 }
 
 // Carregar ao iniciar
-document.addEventListener('DOMContentLoaded', loadSettings);
+document.addEventListener('DOMContentLoaded', () => {
+  renderCleanupActions();
+  loadSettings();
+});
+
+// Executar limpeza
+async function handleCleanup(scope) {
+  const action = cleanupActions.find(item => item.scope === scope);
+  const label = action ? action.title.toLowerCase() : 'esta ação';
+
+  if (!confirm(`Deseja realmente ${label}? Esta ação não pode ser desfeita.`)) {
+    return;
+  }
+
+  try {
+    const response = await api.cleanupData(scope);
+    if (response.data.sucesso) {
+      showMessage('Dados apagados com sucesso!', 'success');
+    } else {
+      showMessage(response.data.mensagem || 'Erro ao apagar dados', 'error');
+    }
+  } catch (error) {
+    showMessage('Erro ao apagar dados', 'error');
+  }
+}

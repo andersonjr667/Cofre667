@@ -155,6 +155,18 @@ class InvestmentsModel {
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
+
+  // Apagar todos investimentos do usuário
+  async deleteManyByUser(userId) {
+    if (isConnected()) {
+      await InvestmentSchema.deleteMany({ userId });
+      return true;
+    }
+    const all = jsonStore.getTable('investments') || [];
+    const remaining = all.filter(i => i.userId !== userId);
+    jsonStore.updateTable('investments', remaining);
+    return true;
+  }
 }
 
 module.exports = new InvestmentsModel();

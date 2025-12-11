@@ -8,5 +8,6 @@ router.use(authMiddleware);
 
 router.get('/', (req, res) => settingsController.getSettings(req, res));
 router.put('/', (req, res) => settingsController.updateSettings(req, res));
+router.post('/cleanup', (req, res) => settingsController.cleanup(req, res));
 
 module.exports = router;

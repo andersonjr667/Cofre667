@@ -226,5 +226,12 @@ const api = {
       method: 'PUT',
       body: JSON.stringify(settings)
     });
+  },
+
+  async cleanupData(scope) {
+    return this.request('/settings/cleanup', {
+      method: 'POST',
+      body: JSON.stringify({ scope })
+    });
   }
 };

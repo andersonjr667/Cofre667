@@ -183,6 +183,24 @@ class TransactionsModel {
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
+
+  // Apagar em lote por usuário (opcionalmente por tipo)
+  async deleteManyByUser(userId, type) {
+    if (isConnected()) {
+      const filter = { userId };
+      if (type) filter.type = type;
+      await TransactionSchema.deleteMany(filter);
+      return true;
+    }
+    const all = jsonStore.getTable('transactions') || [];
+    const remaining = all.filter(t => {
+      if (t.userId !== userId) return true;
+      if (type && t.type !== type) return true;
+      return false;
+    });
+    jsonStore.updateTable('transactions', remaining);
+    return true;
+  }
 }
 
 module.exports = new TransactionsModel();
