@@ -4,6 +4,30 @@ let categories = {
   income: ['Salário', 'Freelance', 'Investimentos', 'Outros'],
   expense: ['Alimentação', 'Transporte', 'Moradia', 'Lazer', 'Saúde', 'Educação', 'Investimentos', 'Outros']
 };
+// Heurística: formato de datas com barras ('/' ) pode ser DD/MM/YYYY ou MM/DD/YYYY.
+// Detectamos o formato ao carregar as transações e armazenamos em `slashDateFormat`.
+let slashDateFormat = 'DMY'; // default assume dia/mês/ano
+
+// Detecta formato predominante nas strings com '/' entre as transações
+function detectSlashDateFormat(records) {
+  let dmy = 0;
+  let mdy = 0;
+  for (const r of (records || [])) {
+    const s = r && r.date;
+    if (!s || typeof s !== 'string') continue;
+    if (!s.includes('/')) continue;
+    const parts = s.split('/').map(p => parseInt(p, 10));
+    if (parts.length !== 3) continue;
+    const [a, b, c] = parts;
+    if (isNaN(a) || isNaN(b) || isNaN(c)) continue;
+    // if first part > 12 -> it's definitely day (DMY)
+    if (a > 12) dmy++;
+    // if second part > 12 -> it's definitely month in DMY and day in MDY, so MDY likely
+    if (b > 12) mdy++;
+    // if year is first (unlikely), skip
+  }
+  return mdy > dmy ? 'MDY' : 'DMY';
+}
 
 // Helper: normaliza strings de data para um objeto Date robusto
 function normalizeToDate(dateStr) {
@@ -19,7 +43,15 @@ function normalizeToDate(dateStr) {
   if (typeof dateStr === 'string' && dateStr.includes('/')) {
     const parts = dateStr.split('/').map(p => parseInt(p, 10));
     if (parts.length === 3) {
-      const [day, month, year] = parts;
+      let [p1, p2, year] = parts;
+      let day, month;
+      if (slashDateFormat === 'MDY') {
+        month = p1;
+        day = p2;
+      } else {
+        day = p1;
+        month = p2;
+      }
       const d = new Date(year, month - 1, day);
       if (!isNaN(d)) return d;
     }
@@ -139,6 +171,12 @@ async function loadTransactions() {
     const response = await api.getTransactions();
     if (response.data.sucesso) {
       transactions = response.data.transacoes;
+      // Detect predominant slash date format after carregamento (to handle legacy data)
+      try {
+        slashDateFormat = detectSlashDateFormat(transactions);
+      } catch (e) {
+        // keep default if detection fails
+      }
       displayTransactions();
       updateBalance();
     }
