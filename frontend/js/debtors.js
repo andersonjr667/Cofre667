@@ -204,48 +204,71 @@ function removeBalanceForm() {
   if (existing) existing.remove();
 }
 
-// Remove any existing history row
-function removeHistoryRow() {
-  const existing = document.getElementById('debtor-history-row');
-  if (existing) existing.remove();
+// Mostrar histórico de transações relacionadas ao devedor em modal
+const historyModal = document.getElementById('history-modal');
+const historyModalBody = document.getElementById('history-modal-body');
+const historyModalTitle = document.getElementById('history-modal-title');
+const closeHistoryModalBtn = document.getElementById('close-history-modal');
+
+function openHistoryModal() {
+  historyModal.classList.add('active');
+}
+
+function closeHistoryModal() {
+  historyModal.classList.remove('active');
+}
+
+if (closeHistoryModalBtn) {
+  closeHistoryModalBtn.addEventListener('click', closeHistoryModal);
+}
+
+if (historyModal) {
+  historyModal.addEventListener('click', (e) => {
+    if (e.target === historyModal) closeHistoryModal();
+  });
+}
+
+// Função para carregar o histórico do devedor
+async function loadDebtorHistory(debtorId) {
+  const modalBody = document.getElementById('history-modal-body');
+  modalBody.textContent = 'Carregando...';
+
+  try {
+    const response = await api.getDebtorHistory(debtorId);
+    if (response.data.sucesso) {
+      const history = response.data.historico;
+      if (history.length === 0) {
+        modalBody.textContent = 'Nenhum histórico encontrado.';
+        return;
+      }
+
+      const historyHtml = history.map(item => `
+        <div class="history-item">
+          <p><strong>Ação:</strong> ${item.action}</p>
+          <p><strong>Descrição:</strong> ${item.description}</p>
+          <p><strong>Valor:</strong> R$ ${item.amount.toFixed(2)}</p>
+          <p><strong>Data:</strong> ${new Date(item.date).toLocaleDateString()}</p>
+        </div>
+      `).join('');
+
+      modalBody.innerHTML = historyHtml;
+    } else {
+      modalBody.textContent = 'Erro ao carregar histórico.';
+    }
+  } catch (error) {
+    console.error('Erro ao carregar histórico do devedor:', error);
+    modalBody.textContent = 'Erro ao carregar histórico.';
+  }
 }
 
 // Mostrar histórico de transações relacionadas ao devedor
 window.showDebtorHistory = async function(debtorId) {
-  removeHistoryRow();
   const debtor = debtors.find(d => d.id === debtorId);
-  if (!debtor) return;
+  if (!debtor || !historyModalBody || !historyModalTitle) return;
 
-  // inserir card abaixo da tabela (criar uma linha única que ocupe a tabela)
-  const table = document.querySelector('#debtors-table table');
-  if (!table) return;
-
-  const tr = document.createElement('tr');
-  tr.id = 'debtor-history-row';
-  tr.innerHTML = `
-    <td colspan="6">
-      <div class="debtor-history-card" style="padding:12px; border-radius:8px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <strong>Histórico - ${debtor.name}</strong>
-          <div>
-            <button id="close-history" class="btn btn-small btn-secondary" style="margin-right:8px;">Fechar</button>
-          </div>
-        </div>
-        <div id="debtor-history-content">Carregando histórico...</div>
-      </div>
-    </td>
-  `;
-
-  // inserir logo após a linha do devedor
-  const rowButton = Array.from(table.querySelectorAll('button')).find(b => b.getAttribute('onclick')?.includes(debtorId));
-  if (rowButton) {
-    const row = rowButton.closest('tr');
-    row.parentNode.insertBefore(tr, row.nextSibling);
-  } else {
-    table.querySelector('tbody').appendChild(tr);
-  }
-
-  document.getElementById('close-history').addEventListener('click', () => removeHistoryRow());
+  historyModalTitle.textContent = `Histórico - ${debtor.name}`;
+  historyModalBody.innerHTML = 'Carregando histórico...';
+  openHistoryModal();
 
   try {
     // Chama endpoint para obter histórico do devedor (se disponível)
@@ -269,9 +292,8 @@ window.showDebtorHistory = async function(debtorId) {
       transactions = response.data.transacoes.filter(t => t.category && t.category.includes(debtor.name));
     }
 
-    const contentEl = document.getElementById('debtor-history-content');
     if (!transactions || transactions.length === 0) {
-      contentEl.innerHTML = '<div style="padding:8px; color:#6b7280;">Nenhuma transação encontrada para este devedor.</div>';
+      historyModalBody.innerHTML = '<div class="history-empty">Nenhuma transação encontrada para este devedor.</div>';
       return;
     }
 
@@ -283,14 +305,14 @@ window.showDebtorHistory = async function(debtorId) {
       </tr>
     `).join('');
 
-    contentEl.innerHTML = `
-      <div style="overflow:auto; max-height:260px;">
-        <table style="width:100%; border-collapse:collapse;">
+    historyModalBody.innerHTML = `
+      <div style="overflow:auto; max-height:340px;">
+        <table class="history-table">
           <thead>
-            <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
-              <th style="padding:8px">Data</th>
-              <th style="padding:8px">Descrição</th>
-              <th style="padding:8px">Valor</th>
+            <tr>
+              <th>Data</th>
+              <th>Descrição</th>
+              <th>Valor</th>
             </tr>
           </thead>
           <tbody>
@@ -300,8 +322,7 @@ window.showDebtorHistory = async function(debtorId) {
       </div>
     `;
   } catch (error) {
-    const contentEl = document.getElementById('debtor-history-content');
-    if (contentEl) contentEl.innerHTML = `<div style="padding:8px; color:#b91c1c;">Erro ao carregar histórico</div>`;
+    historyModalBody.innerHTML = '<div class="history-empty" style="color:#b91c1c;">Erro ao carregar histórico</div>';
     console.error('Erro ao carregar histórico do devedor:', error);
   }
 }
@@ -378,16 +399,25 @@ window.showBalanceForm = function(debtorId) {
     }
 
     try {
-      // atualizar devedor
-      await api.updateDebtor(debtorId, { amount: newAmount, updatedAt: new Date().toISOString() });
+      const isoDate = date ? new Date(`${date}T12:00:00`).toISOString() : new Date().toISOString();
 
-      // criar transação para histórico e balance
+      // atualizar devedor com metadados para histórico
+      await api.updateDebtor(debtorId, {
+        amount: newAmount,
+        updatedAt: new Date().toISOString(),
+        actionType: action,
+        actionValue: amount,
+        actionDate: isoDate,
+        actionDescription: desc
+      });
+
+      // criar transação para refletir no fluxo financeiro
       const tx = {
         type: action === 'pagou' ? 'entrada' : 'saida',
         category: `${action === 'pagou' ? 'Recebimento' : 'Empréstimo'} - Devedor: ${debtor.name}`,
         amount: amount,
         description: desc || (action === 'pagou' ? 'Pagamento recebido' : 'Novo empréstimo'),
-        date: date ? new Date(`${date}T12:00:00`).toISOString() : new Date().toISOString()
+        date: isoDate
       };
       await api.createTransaction(tx);
 
